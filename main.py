@@ -5,6 +5,7 @@ import numpy as np
 import hashlib
 import time
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 # 1. Initialize the API
 app = FastAPI(title="MediFlow Intelligence API", version="1.0")
@@ -18,6 +19,14 @@ class PatientData(BaseModel):
     weight_loss_kg: float
     night_sweats: int
     hemoptysis: int
+#this allows the communication between the frontend and the FASTApi
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"], # Next.js default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 3. Load the AI Brain on startup
 MODEL_PATH = "models/rf_tb_model.pkl"
