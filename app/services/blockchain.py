@@ -14,56 +14,70 @@ class MediFlowBlockchain:
         self.w3 = None
         self.contract = None
         self.account = None
+        self.is_connected = False
         self.mock_mode = True
-        self.chain = [] # For mock mode simulation
+        self.chain: List[Dict] = []  # Mock ledger events (predictions + validations)
 
-        if provider_url and contract_address:
-            try:
-                self.w3 = Web3(Web3.HTTPProvider(provider_url))
-                if self.w3.is_connected():
-                    # Load contract ABI from Foundry artifacts
-                    abi_path = "blockchain/out/MediFlow.sol/MediFlow.json"
-                    if os.path.exists(abi_path):
-                        with open(abi_path, "r") as f:
-                            contract_json = json.load(f)
-                            self.contract = self.w3.eth.contract(
-                                address=Web3.to_checksum_address(contract_address), 
-                                abi=contract_json["abi"]
-                            )
-                        
-                        if private_key:
-                            self.account = Account.from_key(private_key)
-                            self.mock_mode = False
-                            logger.info(f"Connected to blockchain at {provider_url}")
-                    else:
-                        logger.warning(f"ABI file not found at {abi_path}. Using mock mode.")
-                else:
-                    logger.warning("Blockchain provider not reachable. Using mock mode.")
-            except Exception as e:
-                logger.error(f"Blockchain init error: {e}. Falling back to mock mode.")
+        if not provider_url or not contract_address:
+            logger.warning("Blockchain configuration incomplete. Running in mock mode.")
+            return
+
+        try:
+            self.w3 = Web3(Web3.HTTPProvider(provider_url))
+            if not self.w3.is_connected():
+                logger.warning("Blockchain provider not reachable. Running in mock mode.")
+                return
+
+            abi_path = "blockchain/out/MediFlow.sol/MediFlow.json"
+            if not os.path.exists(abi_path):
+                logger.warning(f"ABI file not found at {abi_path}. Running in mock mode.")
+                return
+
+            with open(abi_path, "r") as f:
+                contract_json = json.load(f)
+                self.contract = self.w3.eth.contract(
+                    address=Web3.to_checksum_address(contract_address),
+                    abi=contract_json["abi"],
+                )
+
+            if not private_key:
+                logger.warning("PRIVATE_KEY not set. Running in read-only mock mode.")
+                return
+
+            self.account = Account.from_key(private_key)
+            self.is_connected = True
+            self.mock_mode = False
+            logger.info(f"Connected to blockchain at {provider_url}")
+        except Exception as e:
+            logger.error(f"Blockchain init error: {e}. Falling back to mock mode.")
 
     def _get_patient_id_hash(self, patient_id: str) -> bytes:
         return hashlib.sha256(patient_id.encode()).digest()
 
     def record_ai_prediction(self, prediction_id: str, patient_id: str, prediction_hash: str) -> Dict:
         patient_id_hash = self._get_patient_id_hash(patient_id)
-        pred_hash_bytes = bytes.fromhex(prediction_hash)
 
         if self.mock_mode:
             logger.info(f"[Mock] Recording AI prediction {prediction_id}")
             tx = {
-                "transaction_id": f"mock_tx_ai_{prediction_id[:8]}",
+                "transaction_hash": f"mock_tx_ai_{prediction_id[:8]}",
                 "prediction_id": prediction_id,
                 "patient_id_hash": patient_id_hash.hex(),
                 "prediction_hash": prediction_hash,
                 "timestamp": datetime.now().isoformat(),
-                "block_number": len(self.chain) + 1
+                "block_number": len(self.chain) + 1,
+                "status": "success",
+                "network": "mock",
             }
-            self.chain.append(tx)
+            self.chain.append({"type": "prediction", **tx})
             return tx
-        
+
+        if not self.is_connected:
+            return {"status": "error", "message": "Blockchain not connected."}
+
+        pred_hash_bytes = bytes.fromhex(prediction_hash)
+
         try:
-            # Build and send transaction
             nonce = self.w3.eth.get_transaction_count(self.account.address)
             tx_data = self.contract.functions.recordAIPrediction(
                 prediction_id,
@@ -83,7 +97,8 @@ class MediFlowBlockchain:
             return {
                 "transaction_hash": tx_hash.hex(),
                 "block_number": receipt.blockNumber,
-                "status": "success"
+                "status": "success",
+                "network": "live",
             }
         except Exception as e:
             logger.error(f"On-chain AI record failed: {e}")
@@ -92,7 +107,23 @@ class MediFlowBlockchain:
     def record_doctor_validation(self, validation_id: str, prediction_id: str, doctor_id: str, decision: str, signature: str) -> Dict:
         if self.mock_mode:
             logger.info(f"[Mock] Recording Doctor validation for {prediction_id}")
-            return {"status": "success", "message": "Mock validation recorded", "transaction_hash": f"mock_tx_val_{validation_id[:8]}"}
+            tx = {
+                "transaction_hash": f"mock_tx_val_{validation_id[:8]}",
+                "validation_id": validation_id,
+                "prediction_id": prediction_id,
+                "doctor_id": doctor_id,
+                "decision": decision,
+                "signature": signature,
+                "timestamp": datetime.now().isoformat(),
+                "block_number": len(self.chain) + 1,
+                "status": "success",
+                "network": "mock",
+            }
+            self.chain.append({"type": "validation", **tx})
+            return tx
+
+        if not self.is_connected:
+            return {"status": "error", "message": "Blockchain not connected."}
 
         try:
             nonce = self.w3.eth.get_transaction_count(self.account.address)
@@ -116,7 +147,8 @@ class MediFlowBlockchain:
             return {
                 "transaction_hash": tx_hash.hex(),
                 "block_number": receipt.blockNumber,
-                "status": "success"
+                "status": "success",
+                "network": "live",
             }
         except Exception as e:
             logger.error(f"On-chain validation record failed: {e}")
@@ -124,10 +156,42 @@ class MediFlowBlockchain:
 
     def get_audit_trail(self, patient_id: str) -> List[Dict]:
         patient_id_hash = self._get_patient_id_hash(patient_id)
-        
+
         if self.mock_mode:
-            return [tx for tx in self.chain if tx.get("patient_id_hash") == patient_id_hash.hex()]
-        
+            predictions: Dict[str, Dict] = {}
+            validations: Dict[str, Dict] = {}
+            for event in self.chain:
+                if event.get("type") == "prediction" and event.get("patient_id_hash") == patient_id_hash.hex():
+                    predictions[event["prediction_id"]] = event
+                elif event.get("type") == "validation":
+                    validations[event.get("prediction_id")] = event
+
+            trail: List[Dict] = []
+            for prediction_id, pred in predictions.items():
+                val = validations.get(prediction_id)
+                trail.append(
+                    {
+                        "prediction": {
+                            "id": prediction_id,
+                            "hash": pred.get("prediction_hash"),
+                            "timestamp": pred.get("timestamp"),
+                            "recorded_by": "mock",
+                        },
+                        "validation": {
+                            "id": val.get("validation_id"),
+                            "decision": val.get("decision"),
+                            "signature": val.get("signature"),
+                            "timestamp": val.get("timestamp"),
+                            "doctor_address": val.get("doctor_id"),
+                        }
+                        if val
+                        else None,
+                    }
+                )
+            return trail
+
+        if not self.is_connected:
+            return []
         try:
             prediction_ids = self.contract.functions.getPatientPredictions(patient_id_hash).call()
             trail = []

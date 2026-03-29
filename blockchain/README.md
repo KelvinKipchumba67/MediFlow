@@ -1,66 +1,51 @@
-## Foundry
+# MediFlow Ledger | Smart Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This directory contains the Ethereum-based accountability layer for the MediFlow TB Diagnostic system.
 
-Foundry consists of:
+## Tech Stack
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- Solidity (^0.8.19)
+- Foundry (Forge, Cast, Anvil)
 
-## Documentation
+## Quick Start
 
-https://book.getfoundry.sh/
+### 1) Install Foundry
 
-## Usage
+Follow the official guide: https://book.getfoundry.sh/getting-started/installation
 
-### Build
+### 2) Install dependencies
 
-```shell
-$ forge build
+```bash
+forge install
 ```
 
-### Test
+### 3) Build & test
 
-```shell
-$ forge test
+```bash
+forge build
+forge test
 ```
 
-### Format
+### 4) Local deployment (Anvil)
 
-```shell
-$ forge fmt
+```bash
+anvil
 ```
 
-### Gas Snapshots
+In a new terminal:
 
-```shell
-$ forge snapshot
+```bash
+forge create src/MediFlow.sol:MediFlow --rpc-url http://127.0.0.1:8545 --interactive
 ```
 
-### Anvil
+After deployment, copy the deployed address and set `CONTRACT_ADDRESS` in the root `.env` so the backend can write to the ledger.
 
-```shell
-$ anvil
-```
+## Helpful commands
 
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```bash
+forge fmt
+forge snapshot
+cast --help
+forge --help
+anvil --help
 ```
