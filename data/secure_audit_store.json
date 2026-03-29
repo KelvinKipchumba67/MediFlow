@@ -283,5 +283,182 @@
             "timestamp": "2026-03-29T13:14:35.473111",
             "blockchain_tx": null
         }
+    },
+    {
+        "prediction_id": "2add7df1-ab06-4802-85c3-7b13bb84d656",
+        "patient_id": "PAT-1042",
+        "ai_hash": "8113a58a25958e3d9ab1d7945afaaa1876f5acbdb57da58b9764de0a13b7c856",
+        "raw_data": {
+            "prediction_id": "2add7df1-ab06-4802-85c3-7b13bb84d656",
+            "patient_id": "PAT-1042",
+            "risk_level": "HIGH",
+            "confidence": 0.95,
+            "timestamp": "2026-03-29T15:55:23.639252",
+            "input_features": {
+                "patient_id": "PAT-1042",
+                "age": 23,
+                "fever_duration_days": 7,
+                "cough_duration_days": 2,
+                "weight_loss_kg": 0.2,
+                "night_sweats": 1,
+                "hemoptysis": 1
+            }
+        },
+        "ai_result": {
+            "risk_level": "HIGH",
+            "confidence": "95.00%",
+            "risk_score": 0.95,
+            "methodology": "Rule-Based (Hemoptysis)",
+            "reasoning": "Hemoptysis is a strong TB indicator.",
+            "recommendation": "Urgent TB testing required."
+        },
+        "blockchain_tx": "mock_tx_ai_2add7df1",
+        "validation": {
+            "doctor_id": "DOC001",
+            "doctor_name": "Dr. Amina Nakasone",
+            "decision": "APPROVED",
+            "override_reason": null,
+            "signature": "06cacf7ea433f24f3e4817518be0d7f5a7cf3fff93c4216540a34a928d003e04",
+            "timestamp": "2026-03-29T15:55:26.383211",
+            "blockchain_tx": "mock_tx_val_2add7df1"
+        }
+    },
+    {
+        "prediction_id": "88d97c28-07ec-4781-81fc-e06248fc052d",
+        "patient_id": "PT-2265",
+        "ai_hash": "46c9e495693cab154c5a444b49ebca9d2e761acbf7d15ce6f83ac7df07397945",
+        "raw_data": {
+            "prediction_id": "88d97c28-07ec-4781-81fc-e06248fc052d",
+            "patient_id": "PT-2265",
+            "risk_level": "HIGH",
+            "confidence": 0.95,
+            "timestamp": "2026-03-29T15:56:05.814001",
+            "input_features": {
+                "patient_id": "PT-2265",
+                "age": 42,
+                "fever_duration_days": 7,
+                "cough_duration_days": 23,
+                "weight_loss_kg": 0.4,
+                "night_sweats": 1,
+                "hemoptysis": 1
+            }
+        },
+        "ai_result": {
+            "risk_level": "HIGH",
+            "confidence": "95.00%",
+            "risk_score": 0.95,
+            "methodology": "Rule-Based (Hemoptysis)",
+            "reasoning": "Hemoptysis is a strong TB indicator.",
+            "recommendation": "Urgent TB testing required."
+        },
+        "blockchain_tx": "mock_tx_ai_88d97c28"
+    },
+    {
+        "prediction_id": "801510cf-32de-4a89-8fa4-33970a397f93",
+        "patient_id": "PT-5438",
+        "ai_hash": "585a42b9c02007f2af398b12bc345dd95928845b165453949cbc93b478c05cee",
+        "raw_data": {
+            "prediction_id": "801510cf-32de-4a89-8fa4-33970a397f93",
+            "patient_id": "PT-5438",
+            "risk_level": "HIGH",
+            "confidence": 0.95,
+            "timestamp": "2026-03-29T15:56:19.235500",
+            "input_features": {
+                "patient_id": "PT-5438",
+                "age": 38,
+                "fever_duration_days": 7,
+                "cough_duration_days": 10,
+                "weight_loss_kg": 3.8,
+                "night_sweats": 1,
+                "hemoptysis": 1
+            }
+        },
+        "ai_result": {
+            "risk_level": "HIGH",
+            "confidence": "95.00%",
+            "risk_score": 0.95,
+            "methodology": "Rule-Based (Hemoptysis)",
+            "reasoning": "Hemoptysis is a strong TB indicator.",
+            "recommendation": "Urgent TB testing required."
+        },
+        "blockchain_tx": "mock_tx_ai_801510cf",
+        "validation": {
+            "doctor_id": "DOC001",
+            "doctor_name": "Dr. Amina Nakasone",
+            "decision": "APPROVED",
+            "override_reason": null,
+            "signature": "20d0fa587f6ed3e4ac2e48d9c4ca280147f4ed0bb48d188c531031648530be4f",
+            "timestamp": "2026-03-29T15:56:21.599576",
+            "blockchain_tx": "mock_tx_val_801510cf"
+        }
+    },
+    {
+        "prediction_id": "1dcf452e-5076-47f8-a438-4d84adbbf6a2",
+        "patient_id": "PT-4067",
+        "ai_hash": "98d453af83b3308b216b081168a0230445c4443f24aef8b2f41100e4de4ac7bf",
+        "raw_data": {
+            "prediction_id": "1dcf452e-5076-47f8-a438-4d84adbbf6a2",
+            "patient_id": "PT-4067",
+            "risk_level": "LOW",
+            "confidence": 0.6,
+            "timestamp": "2026-03-29T16:44:14.979155",
+            "input_features": {
+                "patient_id": "PT-4067",
+                "age": 56,
+                "fever_duration_days": 7,
+                "cough_duration_days": 26,
+                "weight_loss_kg": 8.5,
+                "night_sweats": 1,
+                "hemoptysis": 0
+            }
+        },
+        "ai_result": {
+            "risk_level": "LOW",
+            "confidence": "60.00%",
+            "risk_score": 0.37,
+            "methodology": "Rule-Based (2 factors)",
+            "reasoning": "Persistent cough (26 days), Night sweats",
+            "recommendation": "Monitor for symptom progression"
+        },
+        "blockchain_tx": "mock_tx_ai_1dcf452e",
+        "validation": {
+            "doctor_id": "DOC001",
+            "doctor_name": "Dr. Amina Nakasone",
+            "decision": "APPROVED",
+            "override_reason": null,
+            "signature": "454a90fb7ed0dc5a279ef57eba0e5666727724b2fd48101a4a46bd36b8cf320f",
+            "timestamp": "2026-03-29T16:44:54.356541",
+            "blockchain_tx": "mock_tx_val_1dcf452e"
+        }
+    },
+    {
+        "prediction_id": "dcbf091f-8b27-41b7-b56c-8e8e17f336a3",
+        "patient_id": "PT-9103",
+        "ai_hash": "ba5afd6b66f13ab61d117262dd3093c3d016ba65aad5cbbca4cd76e965af1cb0",
+        "raw_data": {
+            "prediction_id": "dcbf091f-8b27-41b7-b56c-8e8e17f336a3",
+            "patient_id": "PT-9103",
+            "risk_level": "HIGH",
+            "confidence": 0.95,
+            "timestamp": "2026-03-29T16:46:09.333339",
+            "input_features": {
+                "patient_id": "PT-9103",
+                "age": 39,
+                "fever_duration_days": 7,
+                "cough_duration_days": 4,
+                "weight_loss_kg": 8.6,
+                "night_sweats": 1,
+                "hemoptysis": 1
+            }
+        },
+        "ai_result": {
+            "risk_level": "HIGH",
+            "confidence": "95.00%",
+            "risk_score": 0.95,
+            "methodology": "Rule-Based (Hemoptysis)",
+            "reasoning": "Hemoptysis is a strong TB indicator.",
+            "recommendation": "Urgent TB testing required."
+        },
+        "blockchain_tx": "mock_tx_ai_dcbf091f"
     }
 ]

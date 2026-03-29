@@ -1,12 +1,5 @@
 import logging
 import os
-<<<<<<< HEAD
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from app.api.endpoints import triage, audit, validate
-=======
 import pandas as pd
 import random
 from fastapi import FastAPI, Request, Depends
@@ -14,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from app.api.endpoints import triage, audit, validate
 from app.api.deps import get_blockchain_service, get_signature_validator
->>>>>>> a1b6ff2f6a05662b15fe7db073692ef0643c0b24
 from app.core.config import settings
 
 # Setup logging
@@ -45,11 +37,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Global error: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
-<<<<<<< HEAD
-        content={"message": "An internal error occurred. Please contact support.", "details": str(exc) if settings.DEBUG else None}
-=======
         content={"message": "An internal error occurred.", "details": str(exc) if settings.DEBUG else None}
->>>>>>> a1b6ff2f6a05662b15fe7db073692ef0643c0b24
     )
 
 # Include routers
@@ -57,22 +45,10 @@ app.include_router(triage.router, prefix="/api/v1/triage", tags=["Triage"])
 app.include_router(validate.router, prefix="/api/v1/validate", tags=["Validation"])
 app.include_router(audit.router, prefix="/api/v1/audit", tags=["Audit"])
 
-<<<<<<< HEAD
-# Serve Frontend
-=======
->>>>>>> a1b6ff2f6a05662b15fe7db073692ef0643c0b24
 @app.get("/")
 async def serve_frontend():
     return FileResponse("frontend/index.html")
 
-<<<<<<< HEAD
-@app.get("/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "version": settings.VERSION,
-        "blockchain_connected": settings.BLOCKCHAIN_PROVIDER_URL is not None
-=======
 @app.get("/api/v1/doctors")
 async def get_doctors(validator = Depends(get_signature_validator)):
     return [{"id": d['id'], "name": d['name']} for d in validator.doctor_registry.values()]
@@ -102,7 +78,6 @@ async def health_check(blockchain = Depends(get_blockchain_service)):
         "status": "healthy",
         "blockchain_connected": blockchain.is_connected,
         "provider": settings.BLOCKCHAIN_PROVIDER_URL
->>>>>>> a1b6ff2f6a05662b15fe7db073692ef0643c0b24
     }
 
 if __name__ == "__main__":
